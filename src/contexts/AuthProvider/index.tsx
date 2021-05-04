@@ -3,9 +3,9 @@ import Router, { useRouter } from 'next/router'
 
 import { destroyCookie, parseCookies, setCookie } from 'nookies'
 
-import { api } from '~/services'
 import { SignInData } from '~/types/submitHandlers'
 import { COOKIE_KEY } from '~/constants'
+import { api } from '~/services'
 
 import { AuthContextData, AuthProviderProps, User } from './types'
 

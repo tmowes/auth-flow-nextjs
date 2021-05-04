@@ -6,9 +6,8 @@ import { yupResolver } from '@hookform/resolvers/yup'
 
 import * as C from '~/components'
 import { SignInFormData } from '~/types'
-import { signInSchema } from '~/utils'
+import { signInSchema, withSSRGuest } from '~/utils'
 import { useAuth } from '~/contexts'
-import { withSSRGuest } from '~/utils/withSSRGuest'
 
 export default function SignIn() {
   const { register, handleSubmit, formState, reset } = useForm({
@@ -75,7 +74,7 @@ export default function SignIn() {
 }
 
 export const getServerSideProps: GetServerSideProps = withSSRGuest(
-  async ctx => ({
+  async () => ({
     props: {},
   })
 )

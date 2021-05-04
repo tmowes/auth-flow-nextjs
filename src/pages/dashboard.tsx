@@ -1,7 +1,11 @@
+import { GetServerSideProps } from 'next'
+
 import { Flex, Text } from '@chakra-ui/react'
 
 import * as C from '~/components'
 import { useAuth } from '~/contexts'
+import { withSSRAuth } from '~/utils'
+import { setupAPIClient } from '~/services'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -17,3 +21,15 @@ export default function Dashboard() {
     </>
   )
 }
+
+export const getServerSideProps: GetServerSideProps = withSSRAuth(async ctx => {
+  const apiClient = setupAPIClient(ctx)
+
+  const { data } = await apiClient.get('/me')
+
+  console.log(data)
+
+  return {
+    props: {},
+  }
+})
