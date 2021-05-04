@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 
-import { parseCookies, setCookie } from 'nookies'
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 
 import { api } from '~/services'
 import { SignInData } from '~/types/submitHandlers'
@@ -10,6 +10,12 @@ import { COOKIE_KEY } from '~/constants'
 import { AuthContextData, AuthProviderProps, User } from './types'
 
 const AuthContext = createContext({} as AuthContextData)
+
+export const signOut = () => {
+  destroyCookie(undefined, `${COOKIE_KEY}.token`)
+  destroyCookie(undefined, `${COOKIE_KEY}.refreshToken`)
+  Router.push('/')
+}
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { push } = useRouter()
@@ -28,8 +34,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           roles,
         })
       }
-      updateUserCookies()
+      updateUserCookies().catch(_ => {
+        signOut()
+      })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const signIn = async ({ email, password }: SignInData) => {
