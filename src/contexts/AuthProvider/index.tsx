@@ -1,3 +1,4 @@
+/* eslint-disable radar/no-small-switch */
 import { createContext, useContext, useEffect, useState } from 'react'
 import Router, { useRouter } from 'next/router'
 
@@ -11,9 +12,12 @@ import { AuthContextData, AuthProviderProps, User } from './types'
 
 const AuthContext = createContext({} as AuthContextData)
 
+let authChannel: BroadcastChannel
+
 export const signOut = () => {
   destroyCookie(undefined, `${COOKIE_KEY}.token`)
   destroyCookie(undefined, `${COOKIE_KEY}.refreshToken`)
+  authChannel.postMessage('signOut')
   Router.push('/')
 }
 
@@ -21,6 +25,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { push } = useRouter()
   const [user, setUser] = useState<User>()
   const isAuthenticated = !!user
+
+  useEffect(() => {
+    authChannel = new BroadcastChannel('auth')
+
+    authChannel.onmessage = ({ data }) => {
+      switch (data) {
+        case 'signOut':
+          signOut()
+          break
+        // case 'signIn':
+        //   push('/dashboard')
+        //   break
+        default:
+          break
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const { 'auth-flow.token': token } = parseCookies()
@@ -72,6 +93,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       api.defaults.headers.Authorization = `Bearer ${token}`
 
       push('/dashboard')
+      // authChannel.postMessage('signIn')
     } catch (error) {
       console.log(error)
     }
@@ -79,6 +101,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const providerValues = {
     signIn,
+    signOut,
     user,
     isAuthenticated,
   }

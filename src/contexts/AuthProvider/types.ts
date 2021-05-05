@@ -4,6 +4,7 @@ import { SignInData } from '../../types/submitHandlers'
 
 export type AuthContextData = {
   signIn: (credentials: SignInData) => Promise<void>
+  signOut: () => void
   user: User
   isAuthenticated: boolean
 }

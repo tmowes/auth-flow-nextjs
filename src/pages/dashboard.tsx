@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next'
 
-import { Flex, Text } from '@chakra-ui/react'
+import { Button, Flex, Stack, Text } from '@chakra-ui/react'
 
 import * as C from '~/components'
 import { useAuth } from '~/contexts'
@@ -8,15 +8,24 @@ import { withSSRAuth } from '~/utils'
 import { setupAPIClient } from '~/services'
 
 export default function Dashboard() {
-  const { user } = useAuth()
-
-  console.log({ user })
+  const { user, signOut } = useAuth()
 
   return (
     <>
       <C.MetaTags />
       <Flex w="100vw" h="100vh" align="center" justify="center">
-        <Text>Dashboard: {user?.email} </Text>
+        <Stack>
+          <Text>Dashboard: {user?.email} </Text>
+          <C.Can permissions={['metrics.list']}>
+            <Text>canSeeMetrics</Text>
+          </C.Can>
+          <C.Can roles={['administrator']}>
+            <Text>onlyAdministrator</Text>
+          </C.Can>
+          <Button colorScheme="blackAlpha" size="lg" my="1" onClick={signOut}>
+            Sair
+          </Button>
+        </Stack>
       </Flex>
     </>
   )
